@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bulk Mapping | TW ↔️ Digitory</title>
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Select2 + jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f4f7;
+            font-weight: 600;
+            color: #444;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 4px 10px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 34px;
+            right: 6px;
+        }
+
+        button {
+            display: block;
+            margin: 30px auto 0;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧾 Bulk Map TW Items to Digitory Items</h1>
+
+    <form action="/map" method="POST">
+        <table>
+            <tr>
+                <th>TW Item Name</th>
+                <th>Digitory Item (Search & Select)</th>
+            </tr>
+            {% for item in tw_beverages %}
+            <tr>
+                <td>
+                    {{ item.name }}
+                    <input type="hidden" name="tw_id_{{ loop.index }}" value="{{ item.id }}">
+                    <input type="hidden" name="tw_name_{{ loop.index }}" value="{{ item.name }}">
+                </td>
+                <td>
+                    <select name="plu_code_{{ loop.index }}" class="digitory-select">
+                        <option value="">-- Select Digitory Item --</option>
+                        {% for digi in digitory_items %}
+                        <option value="{{ digi.pluCode }}">{{ digi.name }} ({{ digi.pluCode }})</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <input type="hidden" name="total_rows" value="{{ tw_beverages|length }}">
+        <button type="submit">💾 Save All Mappings</button>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            $('.digitory-select').select2({
+                placeholder: "Search Digitory Item",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✅ Mappings Saved</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            padding: 30px;
+            background: #f9f9fb;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f1f3f6;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ Mappings Successfully Saved</h1>
+
+    {% if mappings %}
+    <table>
+        <tr>
+            <th>TW Item (ID)</th>
+            <th>Digitory Item (PLU)</th>
+        </tr>
+        {% for m in mappings %}
+        <tr>
+            <td>{{ m.tw_name }} ({{ m.tw_id }})</td>
+            <td>{{ m.digitory_name }} ({{ m.plu_code }})</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p style="text-align:center;">No mappings were submitted.</p>
+    {% endif %}
+
+    <p style="text-align:center; margin-top:20px;">
+        <a href="/">← Map More Items</a>
+    </p>
+</body>
+</html>

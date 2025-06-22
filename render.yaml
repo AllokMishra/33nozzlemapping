@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nozzle-mapper
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python app.py
+    envVars:
+      - key: MONGO_URI
+        value: your_mongo_uri_here
+      - key: MONGO_DB_NAME
+        value: mapping_db

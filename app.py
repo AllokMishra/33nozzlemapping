@@ -2,13 +2,14 @@ from flask import Flask, render_template, request
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os, json, re
+import pandas as pd
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-# MongoDB Atlas connection
+# MongoDB connection
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("MONGO_DB_NAME")
 
@@ -16,8 +17,7 @@ client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 mappings_collection = db['mappings']
 
-# --- Helpers ---
-
+# --- Helper: Parse JSON from tw.md ---
 def clean_trailing_commas(json_str):
     return re.sub(r',\s*(\]|\})', r'\1', json_str)
 
@@ -36,19 +36,24 @@ def extract_json_from_file(file_path):
         print(f"Error loading {file_path}:", e)
         return []
 
-# --- Load Data ---
+# --- Load TW items from tw.md ---
 tw_data = extract_json_from_file('tw.md')
-digitory_data = extract_json_from_file('digi.md')
-
 tw_beverages = [
     {'id': str(item['id']), 'name': item['name']}
     for item in tw_data if item.get('types') == 'Secondary menu'
 ]
 
-digitory_items = [
-    {'pluCode': item['pluCode'], 'name': item['name']}
-    for item in digitory_data if item.get('pluCode')
-]
+# --- Load Digitory items from digi.xlsx (Name + PLU Code columns) ---
+try:
+    df = pd.read_excel('digi.xlsx')  # File with 'Name' and 'PLU Code' columns
+    digitory_items = [
+        {'pluCode': str(row['PLU Code']), 'name': str(row['Name'])}
+        for _, row in df.iterrows()
+        if pd.notnull(row['PLU Code']) and pd.notnull(row['Name'])
+    ]
+except Exception as e:
+    print("❌ Error loading digi.xlsx:", e)
+    digitory_items = []
 
 # --- Routes ---
 
@@ -87,5 +92,4 @@ def map_items():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-
+    app.run(debug=False, host='0.0.0.0', port=port)
